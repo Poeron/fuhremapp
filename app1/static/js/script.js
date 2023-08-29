@@ -15,9 +15,6 @@ $( document ).ready(function() {
     		if(windowH > truecontentH) {
     			$('.hero').css('height', (newH)+'px');
     		}
-
     	})          
     });
-
-
 });

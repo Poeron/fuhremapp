@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+   {% load static %}
    <meta charset="UTF-8">
    <title>Fuhrem</title>
    <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
-   <link rel="stylesheet" type="text/css" href="assets/css/flexboxgrid.min.css" media="all" />
-   <link rel="stylesheet" type="text/css" href="assets/css/style.css" media="all" />
+   <link rel="stylesheet" type="text/css" href="../static/css/flexboxgrid.min.css" media="all" />
+   <link rel="stylesheet" type="text/css" href="../static/css/style.css" media="all" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
    </head>
    <body>
+      {% load static %}
       <header class="fade-in">
          <div class="navigation-bar flex middle-xs">
-            <a href="index.html"><img src="assets/img/logo.png" class="logo"></a> 
+            <a href="index.html"><img src="../static/img/logo.png" class="logo"></a> 
             <nav class="end-xs">
                <ul>
                   <li><a href="#intro">About Project</a></li>
                   <li><a href="#fteam">Fuhrem Team</a></li>
-                  <li><a href="assets/pages/search.html">Search</a></li>
+                  <li><a href="{% url 'search' %}">Search</a></li>
                </ul>
             </nav>
          </div>
-         <div class="hero flex middle-xs" style="background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7)), url('assets/img/hero-image.png');">
+         <div class="hero flex middle-xs" style="background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7)), url('../static/img/hero-image.png');">
             <div class="hero-text ">
                <h1>Fuhrem Project</h1>
                <br>
                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod ea facere a. Illum possimus earum dolore optio quam? Fugit doloremque nesciunt vitae molestiae </p>
                <br>
-               <a href="assets/pages/search.html"><button class="light">Search</button></a>
+               <a href="{% url 'search' %}"><button class="light">Search</button></a>
             </div>
          </div>
       </header>
@@ -63,7 +65,7 @@
             <div class="row team center-xs">
                <div class="col-md">
                   <div class="hover-outer-box">
-                     <img class="team-container" src="assets/img/ronay.jpg">
+                     <img class="team-container" src="../static/images/ronay.jpg">
                      <div class="hover-inner-box">
                         <div class="hover-content">
                            <h3>Ronay Öktem</h3>
@@ -78,7 +80,7 @@
                </div>
                <div class="col-md">
                   <div class="hover-outer-box">
-                     <img class="team-container" src="assets/img/umit.jpg">
+                     <img class="team-container" src="../static/images/umit.jpg">
                      <div class="hover-inner-box">
                         <div class="hover-content">
                            <h3>Ümit Çiftçi</h3>
@@ -93,7 +95,7 @@
                </div>
                <div class="col-md">
                   <div class="hover-outer-box">
-                     <img src="assets/img/ferhat.jpg">
+                     <img src="../static/images/ferhat.jpg">
                      <div class="hover-inner-box">
                         <div class="hover-content">
                            <h3>Ferhat Telman</h3>
@@ -109,7 +111,7 @@
                <div class="row team center-xs">
                   <div class="col-md">
                      <div class="hover-outer-box">
-                        <img class="team-container" src="assets/img/eren.jpg">
+                        <img class="team-container" src="../static/images/eren.jpg">
                         <div class="hover-inner-box">
                            <div class="hover-content">
                               <h3>Eren İgit</h3>
@@ -124,7 +126,7 @@
                   </div>
                   <div class="col-md">
                      <div class="hover-outer-box">
-                        <img class="team-container" src="assets/img/helin.jpeg">
+                        <img class="team-container" src="../static/images/helin.jpeg">
                         <div class="hover-inner-box">
                            <div class="hover-content">
                               <h3>Helin Aktas</h3>
@@ -139,7 +141,7 @@
                   </div>
                   <div class="col-md">
                      <div class="hover-outer-box">
-                        <img class="team-container" src="assets/img/efe.jpg">
+                        <img class="team-container" src="../static/images/efe.jpg">
                         <div class="hover-inner-box">
                            <div class="hover-content">
                               <h3>Efe Şahinbaş</h3>
@@ -168,7 +170,7 @@
       </div>
       <script src="https://cdn.polyfill.io/v2/polyfill.min.js?callback=polyfillsAreLoaded" defer></script>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-      <script src="assets/js/script.js" defer></script>
+      <script src="../static/js/script.js" defer></script>
       <script src="https://kit.fontawesome.com/d8d073e99f.js" crossorigin="anonymous"></script>
    </body>
 </html>

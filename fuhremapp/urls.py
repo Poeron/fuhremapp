@@ -20,8 +20,9 @@ from app1 import views
 #http://127.0.0.1:8000/
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('',views.HomePage, name='home'),
+    path('admin/', admin.site.urls),
+    path('home/',views.HomePage, name='home'),
     path('result/', views.ResultPage, name='result'),
     path('search/', views.SearchPage, name='search'),
 ]

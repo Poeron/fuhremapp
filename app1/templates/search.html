@@ -1,23 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+   <style>
+      select,
+      input[type="text"],
+      input[type="number"],
+      input[type="submit"] {
+         width: 100%;
+         padding: 8px;
+         margin-bottom: 10px;
+         border: none;
+         border-radius: 5px;
+      }
+      .form-container {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         height: 70vh;
+         color: #eee;
+      }
+      form {
+         border-radius: 10px;
+         width: 600px;
+         color: #eee;
+      }
+
+      label {
+         display: block;
+         margin-bottom: 5px;
+      }
+
+      input[type="number"],
+      input[type="text"],
+      select {
+         background-color: #eee;
+      }
+
+      input[type="submit"] {
+         background-color: #3FA0D9;
+         cursor: pointer;
+         transition: background-color 0.3s;
+      }
+
+      input[type="submit"]:hover {
+         background-color: #3E86B0;
+      }
+   </style>
+   {% load static %}
    <meta charset="UTF-8">
    <title>Fuhrem </title>
    <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
-   <link rel="stylesheet" type="text/css" href="../static/css/flexboxgrid.min.css" media="all" />
-   <link rel="stylesheet" type="text/css" href="../static/css/style.css" media="all" />
+   <link rel="stylesheet" type="text/css" href={% static 'css/flexboxgrid.min.css' %} media="all" />
+   <link rel="stylesheet" type="text/css" href={% static 'css/style.css' %} media="all" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   </head>  
-<body>
-  
-
-
-
-
-         <hr style="color: white;">
-         <a href="https://linkedin.com/in/efe-sahinbas/" style=" color: white;">
-         <span class="copy">Copyright &copy;2022 All rights reserved | This Website is made by Efe Şahinbaş </span>
-         </a>
+</head>  
+   <body>
+      {% load static %}
+      <header class="fade-in">
+         <div class="navigation-bar flex middle-xs">
+            <a href="{% url 'home' %}"><img src={% static 'images/logo.png' %} class="logo"></a> 
+         </div>
+      </header>
+      
+      <div class="form-container">
+         <div class="content">
+            <form>
+            <label for="dropdown">Select an option:</label>
+            <select id="dropdown" name="dropdown">
+                  <option value="option1">Photo</option>
+                  <option value="option2">Vector</option>
+                  <option value="option3">Illustration</option>
+                  <option value="option4">Video</option>
+                  <option value="option5">Editorial Image</option>
+                  <option value="option6">Editorial Video</option>
+            </select>
+            
+            <label for="textInput">Text Input:</label>
+            <input type="text" id="textInput" name="textInput" placeholder="Search for images">
+            
+            <label for="numberInput">Search Amount:</label>
+            <input type="number" id="numberInput" name="numberInput" min="1" max="10000" placeholder="Enter the amount">
+            
+            <input type="submit" value="Submit">
+            </form>
+         </div>
       </div>
+
+      <div class="row footer" style="background-color: black;">
+         <div class="col-md" style="text-align: center;">
+            <hr style="color: white;">
+            <a href="https://linkedin.com/in/efe-sahinbas/" style=" color: white;">
+            <span class="copy">Copyright &copy;2022 All rights reserved | This Website is made by Efe Şahinbaş </span>
+            </a>
+         </div>
+      </div>
+
       <script src="https://cdn.polyfill.io/v2/polyfill.min.js?callback=polyfillsAreLoaded" defer></script>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
       <script src="../static/js/script.js" defer></script>

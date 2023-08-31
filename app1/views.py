@@ -74,12 +74,10 @@ def saveGraphic():
     plt.xticks(rotation=0)
     plt.yticks(fontsize=10)
     plt.tight_layout()
-    file_path = 'static/images/grafik.png'
+    file_path = 'app1/static/images/grafik.png'
     if os.path.exists(file_path):
         os.remove(file_path)
     plt.savefig(file_path)
-    response = FileResponse(file_path)
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 
 def pwFunction(veri_turu, arama_sayisi, input_degeri):
     try:

@@ -9,6 +9,9 @@ from datetime import datetime
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import os
+import time
+from datetime import datetime
+import shutil
 import matplotlib.pyplot as plt
 import matplotlib
 import seaborn as sns
@@ -21,9 +24,6 @@ def HomePage(request):
 
 def SearchPage(request):
     return render(request, 'search.html')
-
-def ResultPage(request):
-    return render(request, 'result.html')
 
 def getTitle ():
     conn = sqlite3.connect('db.sqlite3')
@@ -51,7 +51,7 @@ def addToDatabase (veri_turu, value, title,  tags, arama_sayisi):
     conn.commit()
     conn.close()
 
-def saveGraphic():
+def ShowResults(request):
     #SQLite veritabanına bağlan
     conn = sqlite3.connect('db.sqlite3')
     cursor = conn.cursor()
@@ -66,35 +66,35 @@ def saveGraphic():
     #Veriyi tekrar sayısına göre çoktan aza doğru sırala
     df_sorted = df.sort_values(by='Tekrar Sayısı', ascending=False)  # ascending=False ile büyükten küçüğe sırala
 
+    plt.figure(figsize=(10, 7)) 
 
     barplot = sns.barplot(data=df_sorted, x='Tekrar Sayısı', y='Tag', palette='viridis')  # Renk paleti 'viridis'
     plt.xlabel('Tekrar Sayısı', fontsize=14)
     plt.ylabel('Tag', fontsize=14)
     plt.title('En Sık Geçen 50 Tag', fontsize=16)
     plt.xticks(rotation=0)
-    plt.yticks(fontsize=10)
+    plt.yticks(fontsize=9)
     plt.tight_layout()
-    file_path = 'app1/static/images/grafik.png'
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    plt.savefig(file_path)
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    folder_path = 'static/images/graphics'
+    file_path = f'{folder_path}/grafik_{timestamp}.png'
+    clear_folder(f'app1/{folder_path}')
+    plt.savefig(f'app1/{file_path}')
+    context = {'graphic_path' : file_path , 'title' : getTitle()[0]}
+    return render(request, 'result.html',context)
 
 def pwFunction(veri_turu, arama_sayisi, input_degeri):
     try:
-        print(1)
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
         cursor.execute("DELETE FROM app1_search_data;")
         cursor.execute("DELETE FROM sqlite_sequence WHERE name='app1_search_data';")
         add_command = """INSERT INTO app1_search_data (tag, title) VALUES (?, ?);"""
-        print(12)
-        print(f"{veri_turu} ve {arama_sayisi} vee {input_degeri}")
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=False,slow_mo=250)
             context = browser.new_context()
             context.grant_permissions(['clipboard-read'])
             web_site = "https://www.shutterstock.com"
-            print(13)
             
             populerlik = False
             # seçilen veri türüne göre url düzenlemesi 
@@ -107,10 +107,8 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
                 url = web_site + "/tr/editorial/video/search/" + input_degeri
             elif veri_turu == "video":
                 url = web_site + "/tr/video/search/" + input_degeri + "?page="
-            print(14)
 
             page = context.new_page()
-            print(15)
             i = 0
             sayfa_sayaci = 1
             page.goto(url + str(sayfa_sayaci))
@@ -118,7 +116,6 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
             html = page.inner_html("div.mui-1nl4cpc-gridContainer-root")
             soup = BeautifulSoup(html,"html.parser")
             hrefs = [a['href'] for a in soup.find_all('a', href=True)]
-            print(len(hrefs))
             arama_sayaci = arama_sayisi
             while(arama_sayaci>0):
                 if(i == len(hrefs)-1):
@@ -165,7 +162,7 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
             tags_list = getTags()
             tags_str = ', '.join([tag[0] for tag in tags_list])
             addToDatabase(veri_turu, input_degeri, title, tags_str, arama_sayisi)
-            saveGraphic()
+            ShowResults()
         return True
     except:
         return False
@@ -214,3 +211,15 @@ def pw_search(request):
         pwFunction(dropdown_value, number_input_value, text_input_value)
         return redirect('result')
     return redirect('search')
+
+def clear_folder(folder_path):
+    # Check if the folder exists
+    if os.path.exists(folder_path):
+        # Iterate through the files in the folder and delete them
+        for filename in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(f"Error deleting {file_path}: {e}")

@@ -14,16 +14,19 @@
       <div class="dcontainer">
          <h1 class="dh1">Graphic Template</h1>
          <div class="dimage-container">
-            <img src="../static/images/grafik.png" alt="">
+            <img src="../{{ graphic_path }}" alt="grafik.png">
+
+
+
          </div>
 
-         <p>Baba Title : Lorem ipsum dolor sit amet consectetur</p>
+         <p>En uygun başlık : {{title}}</p>
          <button type="submit" class="download-button">Download Excel Document</button>
          <br><br>
-         <button class="goback"><a href="search.html" class="gobacka">Go Search Page</a></button>
+         <button class="goback"><a href="{% url 'search' %}" class="gobacka">Go Search Page</a></button>
       </div>
       <div class="row footer" style="background-color: black;">
-      <div class="col-md" style="text-align: center;">
+   <div class="col-md" style="text-align: center;">
          <hr style="color: white;">
          <a href="https://linkedin.com/in/ronayoktem/" style=" color: white;">
             <span class="copy">Copyright &copy;2022 All rights reserved | This Website is made by Fuhrem </span>

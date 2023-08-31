@@ -24,5 +24,6 @@ urlpatterns = [
     path('home/',views.HomePage, name='home'),
     path('result/', views.ResultPage, name='result'),
     path('search/', views.SearchPage, name='search'),
+    path('search/submit/', views.pw_search, name='pw_search'),
     path('admin/', admin.site.urls)
 ]

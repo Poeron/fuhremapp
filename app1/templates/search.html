@@ -64,24 +64,25 @@
       
       <div class="form-container">
          <div class="content">
-            <form>
-            <label for="dropdown">Select an option:</label>
-            <select id="dropdown" name="dropdown">
-                  <option value="option1">Photo</option>
-                  <option value="option2">Vector</option>
-                  <option value="option3">Illustration</option>
-                  <option value="option4">Video</option>
-                  <option value="option5">Editorial Image</option>
-                  <option value="option6">Editorial Video</option>
-            </select>
-            
-            <label for="textInput">Text Input:</label>
-            <input type="text" id="textInput" name="textInput" placeholder="Search for images">
-            
-            <label for="numberInput">Search Amount:</label>
-            <input type="number" id="numberInput" name="numberInput" min="1" max="10000" placeholder="Enter the amount">
-            
-            <input type="submit" value="Submit">
+            <form id="search_form" method="post" action="{% url 'pw_search' %}">
+               {% csrf_token %}
+               <label for="dropdown">Select an option:</label>
+               <select id="dropdown" name="dropdown">
+                     <option value="photo">Photo</option>
+                     <option value="vector">Vector</option>
+                     <option value="illustration">Illustration</option>
+                     <option value="video">Video</option>
+                     <option value="editorial image">Editorial Image</option>
+                     <option value="editorial video">Editorial Video</option>
+               </select>
+               
+               <label for="textInput">Text Input:</label>
+               <input type="text" id="textInput" name="textInput" placeholder="Search for images">
+               
+               <label for="numberInput">Search Amount:</label>
+               <input type="number" id="numberInput" name="numberInput" min="1" max="10000" placeholder="Enter the amount">
+               
+               <input id = "submitButton" type="submit" value="Submit">
             </form>
          </div>
       </div>

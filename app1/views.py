@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.http import FileResponse, HttpResponse
+from django.http import JsonResponse
 import openpyxl
 import pandas as pd
 from django.db import connection
@@ -23,16 +24,6 @@ def SearchPage(request):
 
 def ResultPage(request):
     return render(request, 'result.html')
-
-def pwSearch(request):
-    if request.method == 'POST':
-            veri_turu = request.POST.get('veri_turu').lower()
-            arama_sayisi = int(request.POST.get('arama_sayisi'))
-            input_degeri = request.POST.get('input_degeri').lower()
-    if(pwFunction(veri_turu, arama_sayisi, input_degeri)):
-        return render(request, 'result.html')
-    else:
-        return HttpResponse("pwSearch fonksiyonu hata verdi!")
 
 def getTitle ():
     conn = sqlite3.connect('db.sqlite3')
@@ -83,24 +74,29 @@ def saveGraphic():
     plt.xticks(rotation=0)
     plt.yticks(fontsize=10)
     plt.tight_layout()
-    file_path = 'app1/static/images/grafik.png'
+    file_path = 'static/images/grafik.png'
     if os.path.exists(file_path):
         os.remove(file_path)
     plt.savefig(file_path)
+    response = FileResponse(file_path)
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 
 def pwFunction(veri_turu, arama_sayisi, input_degeri):
     try:
+        print(1)
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
         cursor.execute("DELETE FROM app1_search_data;")
         cursor.execute("DELETE FROM sqlite_sequence WHERE name='app1_search_data';")
         add_command = """INSERT INTO app1_search_data (tag, title) VALUES (?, ?);"""
-
+        print(12)
+        print(f"{veri_turu} ve {arama_sayisi} vee {input_degeri}")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=False)
             context = browser.new_context()
             context.grant_permissions(['clipboard-read'])
             web_site = "https://www.shutterstock.com"
+            print(13)
             
             populerlik = False
             # seçilen veri türüne göre url düzenlemesi 
@@ -113,8 +109,10 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
                 url = web_site + "/tr/editorial/video/search/" + input_degeri
             elif veri_turu == "video":
                 url = web_site + "/tr/video/search/" + input_degeri + "?page="
+            print(14)
 
             page = context.new_page()
+            print(15)
             i = 0
             sayfa_sayaci = 1
             page.goto(url + str(sayfa_sayaci))
@@ -208,3 +206,13 @@ def downloadExcel(request):
     response['Content-Disposition'] = f'attachment; filename={xlsx_filename}'
 
     return response
+
+def pw_search(request):
+    if request.method == 'POST':
+        dropdown_value = request.POST.get('dropdown').lower()
+        number_input_value = int(request.POST.get('numberInput'))
+        text_input_value = request.POST.get('textInput').lower()
+        # Call your Python function with the collected values
+        pwFunction(dropdown_value, number_input_value, text_input_value)
+        return redirect('result')
+    return redirect('search')

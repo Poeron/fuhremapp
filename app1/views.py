@@ -169,8 +169,8 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
     
 def downloadExcel(request):
     # Yeni dosya adı oluşturma
-    timestamp = datetime.datetime.now().strftime("%Y%m%d%H.%M.%S")
-    xlsx_filename = f"veriler_{timestamp}.xlsx"
+    timestamp = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
+    xlsx_filename = f"tagler_{timestamp}.xlsx"
 
     # SQLite veritabanına bağlan
     conn = sqlite3.connect('db.sqlite3')
@@ -192,15 +192,15 @@ def downloadExcel(request):
         sheet.append([tagler, tekrar_sayisi])
 
     # Dosyayı kaydet
-    workbook.save(xlsx_filename)
+    file_path = f"app1/static/excel_files/{xlsx_filename}"
+    workbook.save(file_path)
 
     # Bağlantıyı kapat
     conn.close()
 
-    response = HttpResponse(open(xlsx_filename, 'rb').read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename={xlsx_filename}'
-
-    return response
+    # Excel dosyasını HttpResponse ile gönder
+    message = "Excel file generated and saved successfully!"
+    return JsonResponse({'message': message})
 
 def pw_search(request):
     if request.method == 'POST':

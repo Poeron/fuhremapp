@@ -45,6 +45,48 @@
       input[type="submit"]:hover {
          background-color: #3E86B0;
       }
+      .loader-container {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         height: 100vh;
+       }
+       
+       .loader {
+         display: flex !important;
+         border: 16px solid #f3f3f3;
+         border-radius: 50%;
+         border-top: 16px solid #3FA0D9;
+         width: 120px;
+         height: 120px;
+         -webkit-animation: spin 2s linear infinite; /* Safari */
+         animation: spin 2s linear infinite;
+       }
+       
+       /* Safari */
+       @-webkit-keyframes spin {
+         0% { -webkit-transform: rotate(0deg); }
+         100% { -webkit-transform: rotate(360deg); }
+       }
+       
+       @keyframes spin {
+         0% { transform: rotate(0deg); }
+         100% { transform: rotate(360deg); }
+       }
+       #loading_screen {
+         display: none;
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background */
+         z-index: 999; /* Make sure it appears above other elements */
+         display: flex;
+         justify-content: center;
+         align-items: center;
+      }
+      
    </style>
    {% load static %}
    <meta charset="UTF-8">
@@ -62,6 +104,7 @@
          </div>
       </header>
       
+      
       <div class="form-container">
          <div class="content">
             <form id="search_form" method="post" action="{% url 'pw_search' %}">
@@ -78,20 +121,25 @@
                
                <label for="textInput">Text Input:</label>
                <input type="text" id="textInput" name="textInput" placeholder="Search for images">
+
                
+
                <label for="numberInput">Search Amount:</label>
                <input type="number" id="numberInput" name="numberInput" min="1" max="10000" placeholder="Enter the amount">
                
                <input id = "submitButton" type="submit" value="Submit">
             </form>
+            <div id="loading_screen" class="loader-container">
+               <div class="loader"></div>
+            </div>
          </div>
       </div>
-
+      
       <div class="row footer" style="background-color: black;">
          <div class="col-md" style="text-align: center;">
             <hr style="color: white;">
             <a href="https://linkedin.com/in/ronayoktem/" style=" color: white;">
-               <span class="copy">Copyright &copy;2022 All rights reserved | This Website is made by Fuhrem </span>
+               <span class="copy">Copyright &copy;2023 All rights reserved | This Website is made by Fuhrem </span>
             </a>
          </div>
       </div>
@@ -100,5 +148,21 @@
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
       <script src="../static/js/script.js" defer></script>
       <script src="https://kit.fontawesome.com/d8d073e99f.js" crossorigin="anonymous"></script>
+      <script>
+         $(document).ready(function () {
+            var form = $("#search_form");
+            var loadingScreen = $("#loading_screen");
+      
+            form.on("submit", function () {
+               loadingScreen.show();
+            });
+      
+            // Hide the loading screen on page load
+            $(window).on("load", function () {
+               loadingScreen.hide();
+            });
+         });
+      </script>
+      
    </body>
 </html>

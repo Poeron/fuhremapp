@@ -91,7 +91,7 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
         cursor.execute("DELETE FROM sqlite_sequence WHERE name='app1_search_data';")
         add_command = """INSERT INTO app1_search_data (tag, title) VALUES (?, ?);"""
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False,slow_mo=250)
+            browser = p.chromium.launch(slow_mo=250)
             context = browser.new_context()
             context.grant_permissions(['clipboard-read'])
             web_site = "https://www.shutterstock.com"

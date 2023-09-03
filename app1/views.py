@@ -91,7 +91,7 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
         cursor = conn.cursor()
         cursor.execute("DELETE FROM app1_search_data;")
         cursor.execute("DELETE FROM sqlite_sequence WHERE name='app1_search_data';")
-        add_command = """INSERT INTO app1_search_data (tag, title) VALUES (?, ?);"""
+        add_command = """INSERT INTO app1_search_data (tag, title, photo_id) VALUES (?, ?, ?);"""
         with sync_playwright() as p:
             browser = p.chromium.launch(slow_mo=250)
             context = browser.new_context()
@@ -138,29 +138,34 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
                         if durum == "En iyi seçim!":
                             arama_sayaci -= 1
                             page.get_by_role("button", name="Anahtar sözcükleri panoya kopyalayın").click()
+                            tags = page.evaluate("navigator.clipboard.readText()").split(',')
                             titles = page.inner_html(".mui-u28gw5-titleRow > h1").split(".")
                             filtered_titles = [title.strip() for title in titles if title.strip()]
-                            tags = page.evaluate("navigator.clipboard.readText()").split(',')
+                            page.get_by_role("button", name="Kodu panoya kopyalayın").click()
+                            photo_id = page.evaluate("navigator.clipboard.readText()")
                             for tag, title in zip(tags, filtered_titles):
-                                cursor.execute(add_command, (tag.strip(), title.strip()))
+                                cursor.execute(add_command, (tag.strip(), title.strip(), photo_id.strip()))
                             for tag in tags[len(filtered_titles):]:
-                                cursor.execute(add_command, (tag.strip(), None))
+                                cursor.execute(add_command, (tag.strip(), None , None))
                 else:
                     arama_sayaci -= 1
                     page.get_by_role("button", name="Anahtar sözcükleri panoya kopyalayın").click()
+                    tags = page.evaluate("navigator.clipboard.readText()").split(',')
                     titles = page.inner_html(".mui-u28gw5-titleRow > h1").split(".")
                     filtered_titles = [title.strip() for title in titles if title.strip()]
-                    tags = page.evaluate("navigator.clipboard.readText()").split(',')
+                    page.get_by_role("button", name="Kodu panoya kopyalayın").click()
+                    photo_id = page.evaluate("navigator.clipboard.readText()")
                     for tag, title in zip(tags, filtered_titles):
-                        cursor.execute(add_command, (tag.strip(), title.strip()))
+                        cursor.execute(add_command, (tag.strip(), title.strip(), photo_id.strip()))
                     for tag in tags[len(filtered_titles):]:
-                        cursor.execute(add_command, (tag.strip(), None))
+                        cursor.execute(add_command, (tag.strip(), None , None))
                 i+=1
             browser.close()
             conn.commit()
             conn.close()
 
-            title = getTitle()[0] if getTitle() else None
+            #add datas to search history database
+            title = getTitle()[0]
             tags_list = getTags()
             tags_str = ', '.join([tag[0] for tag in tags_list])
             addToDatabase(veri_turu, input_degeri, title, tags_str, arama_sayisi)

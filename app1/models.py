@@ -4,6 +4,7 @@ from django.db import models
 class Search_data(models.Model):
     title = models.TextField(null=True)
     tag = models.CharField(max_length=15)
+    photo_id = models.CharField(max_length=10,null=True)
 
 class Search_history(models.Model):
     image_type = models.CharField(max_length=15)

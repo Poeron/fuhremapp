@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import seaborn as sns
 matplotlib.use('Agg')
+from django.contrib import messages
 
 # Create your views here.
 
@@ -23,7 +24,8 @@ def HomePage(request):
     return render(request, 'index.html')
 
 def SearchPage(request):
-    return render(request, 'search.html')
+    messages_list = messages.get_messages(request)
+    return render(request, 'search.html', {'messages_list': messages_list})
 
 def getTitle ():
     conn = sqlite3.connect('db.sqlite3')
@@ -162,9 +164,9 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
             tags_list = getTags()
             tags_str = ', '.join([tag[0] for tag in tags_list])
             addToDatabase(veri_turu, input_degeri, title, tags_str, arama_sayisi)
-            ShowResults()
         return True
     except:
+        conn.close()
         return False
     
 def downloadExcel(request):
@@ -208,9 +210,12 @@ def pw_search(request):
         number_input_value = int(request.POST.get('numberInput'))
         text_input_value = request.POST.get('textInput').lower()
         # Call your Python function with the collected values
-        pwFunction(dropdown_value, number_input_value, text_input_value)
-        return redirect('result')
-    return redirect('search')
+        result = pwFunction(dropdown_value, number_input_value, text_input_value)
+        if result:
+            return redirect('result')
+        else:
+            messages.error(request, 'No results found. Please try again.')
+            return redirect('search')
 
 def clear_folder(folder_path):
     # Check if the folder exists

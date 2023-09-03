@@ -128,6 +128,13 @@
                <input type="number" id="numberInput" name="numberInput" min="1" max="10000" placeholder="Enter the amount">
                
                <input id = "submitButton" type="submit" value="Submit">
+               {% if messages_list %}
+                  <ul class="messages">
+                     {% for message in messages_list %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                     {% endfor %}
+                  </ul>
+               {% endif %}
             </form>
             <div id="loading_screen" class="loader-container">
                <div class="loader"></div>

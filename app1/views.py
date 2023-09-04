@@ -17,6 +17,13 @@ import matplotlib
 import seaborn as sns
 matplotlib.use('Agg')
 from django.contrib import messages
+import logging
+
+# Define constants
+WEB_SITE = "https://www.shutterstock.com"
+DATABASE_NAME = "db.sqlite3"
+DELETE_COMMAND = "DELETE FROM app1_search_data;"
+INSERT_COMMAND = "INSERT INTO app1_search_data (tag, title, photo_id) VALUES (?, ?, ?);"
 
 # Create your views here.
 
@@ -87,28 +94,27 @@ def ShowResults(request):
 
 def pwFunction(veri_turu, arama_sayisi, input_degeri):
     try:
-        conn = sqlite3.connect('db.sqlite3')
+        conn = sqlite3.connect(DATABASE_NAME)
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM app1_search_data;")
+        cursor.execute(DELETE_COMMAND)
         cursor.execute("DELETE FROM sqlite_sequence WHERE name='app1_search_data';")
-        add_command = """INSERT INTO app1_search_data (tag, title, photo_id) VALUES (?, ?, ?);"""
+        
         with sync_playwright() as p:
             browser = p.chromium.launch(slow_mo=250)
             context = browser.new_context()
             context.grant_permissions(['clipboard-read'])
-            web_site = "https://www.shutterstock.com"
             
             populerlik = False
             # seçilen veri türüne göre url düzenlemesi 
             if veri_turu == "vector" or veri_turu =="photo" or veri_turu == "illustration":
-                url = web_site + "/tr/search/" + input_degeri + "?image_type=" + veri_turu + "&page="
+                url = WEB_SITE + "/tr/search/" + input_degeri + "?image_type=" + veri_turu + "&page="
                 populerlik = True
             elif veri_turu == "editorial image":
-                url = web_site + "/tr/editorial/search/" + input_degeri
+                url = WEB_SITE + "/tr/editorial/search/" + input_degeri
             elif veri_turu == "editorial video":
-                url = web_site + "/tr/editorial/video/search/" + input_degeri
+                url = WEB_SITE + "/tr/editorial/video/search/" + input_degeri
             elif veri_turu == "video":
-                url = web_site + "/tr/video/search/" + input_degeri + "?page="
+                url = WEB_SITE + "/tr/video/search/" + input_degeri + "?page="
 
             page = context.new_page()
             i = 0
@@ -130,7 +136,7 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
                     soup = BeautifulSoup(html,"html.parser")
                     hrefs = [a['href'] for a in soup.find_all('a', href=True)]
 
-                page.goto(web_site+hrefs[i])
+                page.goto(WEB_SITE+hrefs[i])
                 page.mouse.wheel(0, 1000)
                 if (populerlik):
                     if page.is_visible("strong.mui-1isu8w6-empasis"):
@@ -144,9 +150,9 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
                             page.get_by_role("button", name="Kodu panoya kopyalayın").click()
                             photo_id = page.evaluate("navigator.clipboard.readText()")
                             for tag, title in zip(tags, filtered_titles):
-                                cursor.execute(add_command, (tag.strip(), title.strip(), photo_id.strip()))
+                                cursor.execute(INSERT_COMMAND, (tag.strip(), title.strip(), photo_id.strip()))
                             for tag in tags[len(filtered_titles):]:
-                                cursor.execute(add_command, (tag.strip(), None , None))
+                                cursor.execute(INSERT_COMMAND, (tag.strip(), None , None))
                 else:
                     arama_sayaci -= 1
                     page.get_by_role("button", name="Anahtar sözcükleri panoya kopyalayın").click()
@@ -156,9 +162,9 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
                     page.get_by_role("button", name="Kodu panoya kopyalayın").click()
                     photo_id = page.evaluate("navigator.clipboard.readText()")
                     for tag, title in zip(tags, filtered_titles):
-                        cursor.execute(add_command, (tag.strip(), title.strip(), photo_id.strip()))
+                        cursor.execute(INSERT_COMMAND, (tag.strip(), title.strip(), photo_id.strip()))
                     for tag in tags[len(filtered_titles):]:
-                        cursor.execute(add_command, (tag.strip(), None , None))
+                        cursor.execute(INSERT_COMMAND, (tag.strip(), None , None))
                 i+=1
             browser.close()
             conn.commit()
@@ -170,8 +176,11 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
             tags_str = ', '.join([tag[0] for tag in tags_list])
             addToDatabase(veri_turu, input_degeri, title, tags_str, arama_sayisi)
         return True
-    except:
-        conn.close()
+    except sqlite3.Error as e:
+        logging.error(f"SQLite error: {str(e)}")
+        return False
+    except Exception as e:
+        logging.error(f"An error occurred: {str(e)}")
         return False
     
 def downloadExcel(request):

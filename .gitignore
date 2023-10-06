@@ -163,6 +163,12 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+#img
+graphics/
+excel_files/
+
+#db
+db.sqlite3
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

@@ -105,21 +105,27 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
             context.grant_permissions(['clipboard-read'])
             
             populerlik = False
+            is_editorial = False
             # seçilen veri türüne göre url düzenlemesi 
             if veri_turu == "vector" or veri_turu =="photo" or veri_turu == "illustration":
                 url = WEB_SITE + "/tr/search/" + input_degeri + "?image_type=" + veri_turu + "&page="
                 populerlik = True
             elif veri_turu == "editorial image":
                 url = WEB_SITE + "/tr/editorial/search/" + input_degeri
+                is_editorial = True
             elif veri_turu == "editorial video":
                 url = WEB_SITE + "/tr/editorial/video/search/" + input_degeri
+                is_editorial = True
             elif veri_turu == "video":
                 url = WEB_SITE + "/tr/video/search/" + input_degeri + "?page="
 
             page = context.new_page()
             i = 0
             sayfa_sayaci = 1
-            page.goto(url + str(sayfa_sayaci))
+            if is_editorial:
+                page.goto(url)
+            else:
+                page.goto(url + str(sayfa_sayaci))
             page.mouse.wheel(0, 10000)
             html = page.inner_html("div.mui-1nl4cpc-gridContainer-root")
             soup = BeautifulSoup(html,"html.parser")
@@ -130,7 +136,10 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
                     i = 0
                     sayfa_sayaci += 1
                     hrefs.clear()
-                    page.goto(url + str(sayfa_sayaci))
+                    if is_editorial:
+                        page.goto(url)
+                    else:
+                        page.goto(url + str(sayfa_sayaci))
                     page.mouse.wheel(0, 10000)
                     html = page.inner_html("div.mui-1nl4cpc-gridContainer-root")
                     soup = BeautifulSoup(html,"html.parser")

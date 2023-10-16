@@ -50,12 +50,12 @@ def getTags ():
     conn.close()
     return value
 
-def addToDatabase (veri_turu, value, title,  tags, arama_sayisi):
+def addToDatabase (image_type, value, title,  tags, search_amount):
     conn = sqlite3.connect('db.sqlite3')
     cursor = conn.cursor()
     add_command = """INSERT INTO app1_search_history (image_type, value, title, tags, search_amount, datetime) VALUES (?, ?, ?, ?, ?, ?);"""
 
-    cursor.execute(add_command, (veri_turu, value, title, tags, arama_sayisi, datetime.now().replace(microsecond=0)))
+    cursor.execute(add_command, (image_type, value, title, tags, search_amount, datetime.now().replace(microsecond=0)))
 
     conn.commit()
     conn.close()
@@ -92,7 +92,7 @@ def ShowResults(request):
     context = {'graphic_path' : file_path , 'title' : getTitle()[0]}
     return render(request, 'result.html',context)
 
-def pwFunction(veri_turu, arama_sayisi, input_degeri):
+def pwFunction(image_type, search_amount, user_input):
     try:
         conn = sqlite3.connect(DATABASE_NAME)
         cursor = conn.cursor()
@@ -104,42 +104,29 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
             context = browser.new_context()
             context.grant_permissions(['clipboard-read'])
             
-            populerlik = False
-            is_editorial = False
+            ranking = False
             # seçilen veri türüne göre url düzenlemesi 
-            if veri_turu == "vector" or veri_turu =="photo" or veri_turu == "illustration":
-                url = WEB_SITE + "/tr/search/" + input_degeri + "?image_type=" + veri_turu + "&page="
-                populerlik = True
-            elif veri_turu == "editorial image":
-                url = WEB_SITE + "/tr/editorial/search/" + input_degeri
-                is_editorial = True
-            elif veri_turu == "editorial video":
-                url = WEB_SITE + "/tr/editorial/video/search/" + input_degeri
-                is_editorial = True
-            elif veri_turu == "video":
-                url = WEB_SITE + "/tr/video/search/" + input_degeri + "?page="
+            if image_type == "vector" or image_type =="photo" or image_type == "illustration":
+                url = WEB_SITE + "/tr/search/" + user_input + "?image_type=" + image_type + "&page="
+                ranking = True
+            elif image_type == "video":
+                url = WEB_SITE + "/tr/video/search/" + user_input + "?page="
 
             page = context.new_page()
             i = 0
-            sayfa_sayaci = 1
-            if is_editorial:
-                page.goto(url)
-            else:
-                page.goto(url + str(sayfa_sayaci))
+            page_counter = 1
+            page.goto(url + str(page_counter))
             page.mouse.wheel(0, 10000)
             html = page.inner_html("div.mui-1nl4cpc-gridContainer-root")
             soup = BeautifulSoup(html,"html.parser")
             hrefs = [a['href'] for a in soup.find_all('a', href=True)]
-            arama_sayaci = arama_sayisi
-            while(arama_sayaci>0):
+            search_counter = search_amount
+            while(search_counter>0):
                 if(i == len(hrefs)-1):
                     i = 0
-                    sayfa_sayaci += 1
+                    page_counter += 1
                     hrefs.clear()
-                    if is_editorial:
-                        page.goto(url)
-                    else:
-                        page.goto(url + str(sayfa_sayaci))
+                    page.goto(url + str(page_counter))
                     page.mouse.wheel(0, 10000)
                     html = page.inner_html("div.mui-1nl4cpc-gridContainer-root")
                     soup = BeautifulSoup(html,"html.parser")
@@ -147,11 +134,11 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
 
                 page.goto(WEB_SITE+hrefs[i])
                 page.mouse.wheel(0, 1000)
-                if (populerlik):
+                if (ranking):
                     if page.is_visible("strong.mui-1isu8w6-empasis"):
                         durum = page.inner_html("strong.mui-1isu8w6-empasis")
                         if durum == "En iyi seçim!":
-                            arama_sayaci -= 1
+                            search_counter -= 1
                             page.get_by_role("button", name="Anahtar sözcükleri panoya kopyalayın").click()
                             tags = page.evaluate("navigator.clipboard.readText()").split(',')
                             titles = page.inner_html(".mui-u28gw5-titleRow > h1").split(".")
@@ -163,7 +150,7 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
                             for tag in tags[len(filtered_titles):]:
                                 cursor.execute(INSERT_COMMAND, (tag.strip(), None , None))
                 else:
-                    arama_sayaci -= 1
+                    search_counter -= 1
                     page.get_by_role("button", name="Anahtar sözcükleri panoya kopyalayın").click()
                     tags = page.evaluate("navigator.clipboard.readText()").split(',')
                     titles = page.inner_html(".mui-u28gw5-titleRow > h1").split(".")
@@ -183,7 +170,7 @@ def pwFunction(veri_turu, arama_sayisi, input_degeri):
             title = getTitle()[0]
             tags_list = getTags()
             tags_str = ', '.join([tag[0] for tag in tags_list])
-            addToDatabase(veri_turu, input_degeri, title, tags_str, arama_sayisi)
+            addToDatabase(image_type, user_input, title, tags_str, search_amount)
         return True
     except sqlite3.Error as e:
         logging.error(f"SQLite error: {str(e)}")

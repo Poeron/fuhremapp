@@ -16,10 +16,10 @@ class Search_history(models.Model):
 
     def __str__ (self):
          return f"""
-            Sorgu Zamanı = {self.datetime} || 
-            Görsel Türü = {self.image_type} || 
-            Aranan Kelime = {self.value} || 
-            Başlık = {self.title} || 
-            Arama Sayısı = {self.search_amount} || 
-            Etiketler = {self.tags} || 
+            Query Date&Time = {self.datetime} || 
+            Image Type = {self.image_type} || 
+            Input Value = {self.value} || 
+            Title = {self.title} || 
+            Search Amount = {self.search_amount} || 
+            Tags = {self.tags} || 
            """

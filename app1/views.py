@@ -66,21 +66,21 @@ def ShowResults(request):
     cursor = conn.cursor()
 
     #Veriyi çek
-    cursor.execute("SELECT tag, COUNT(tag) AS tekrar_sayisi FROM app1_search_data GROUP BY tag ORDER BY tekrar_sayisi DESC LIMIT 50")
+    cursor.execute("SELECT tag, COUNT(tag) AS amount FROM app1_search_data GROUP BY tag ORDER BY amount DESC LIMIT 50")
     data = cursor.fetchall()
 
     #Veriyi pandas DataFrame'e dönüştür
-    df = pd.DataFrame(data, columns=['Tag', 'Tekrar Sayısı'])
+    df = pd.DataFrame(data, columns=['Tag', 'Amount'])
 
     #Veriyi tekrar sayısına göre çoktan aza doğru sırala
-    df_sorted = df.sort_values(by='Tekrar Sayısı', ascending=False)  # ascending=False ile büyükten küçüğe sırala
+    df_sorted = df.sort_values(by='Amount', ascending=False)  # ascending=False ile büyükten küçüğe sırala
 
     plt.figure(figsize=(10, 7)) 
 
-    barplot = sns.barplot(data=df_sorted, x='Tekrar Sayısı', y='Tag', palette='viridis')  # Renk paleti 'viridis'
-    plt.xlabel('Tekrar Sayısı', fontsize=14)
+    barplot = sns.barplot(data=df_sorted, x='Amount', y='Tag', palette='viridis')  # Renk paleti 'viridis'
+    plt.xlabel('Amount', fontsize=14)
     plt.ylabel('Tag', fontsize=14)
-    plt.title('En Sık Geçen 50 Tag', fontsize=16)
+    plt.title('50 Most Frequently Used Tags', fontsize=16)
     plt.xticks(rotation=0)
     plt.yticks(fontsize=9)
     plt.tight_layout()
@@ -100,7 +100,7 @@ def pwFunction(image_type, search_amount, user_input):
         cursor.execute("DELETE FROM sqlite_sequence WHERE name='app1_search_data';")
         
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False, slow_mo=250)
+            browser = p.chromium.launch(slow_mo=500)
             context = browser.new_context()
             context.grant_permissions(['clipboard-read'])
             

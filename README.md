@@ -30,7 +30,9 @@ playwright install
 ### Installation
 
 #### Clone the repository
+```bash
 git clone https://github.com/Poeron/fuhremapp
+```
 
 ### Usage
 type this in terminal to start the project:
